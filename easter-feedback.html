@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easter Experience Feedback | Central</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400;1,9..40,700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #101010;
+    --white: #E7E7E7;
+    --pure-white: #ffffff;
+    --surface: #1a1a1a;
+    --border: rgba(231,231,231,0.1);
+    --border-hover: rgba(231,231,231,0.32);
+    --muted: rgba(231,231,231,0.38);
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+  .site-header { background: var(--pure-white); padding: 3rem 1.5rem 2.5rem; text-align: center; }
+  .wordmark { font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--black); margin-bottom: 1.75rem; }
+  .header-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(16,16,16,0.38); margin-bottom: 0.4rem; }
+  .header-title { font-size: clamp(40px, 8vw, 64px); font-weight: 800; color: var(--black); line-height: 1.0; letter-spacing: -0.025em; margin-bottom: 0; }
+  .header-title em { font-style: italic; font-weight: 400; }
+  .header-divider { width: 28px; height: 3px; background: var(--black); margin: 1.25rem auto; }
+  .header-sub { font-size: 14px; color: rgba(16,16,16,0.48); max-width: 360px; margin: 0 auto; }
+
+  .form-wrap { max-width: 580px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 2.75rem 0 0.9rem; }
+
+  .q-block { background: var(--surface); border: 0.5px solid var(--border); border-radius: 4px; padding: 1.25rem 1.4rem; margin-bottom: 8px; }
+  .q-block.has-error { border-color: rgba(210,70,70,0.45); }
+
+  .q-text { font-size: 14px; font-weight: 600; color: var(--white); line-height: 1.5; margin-bottom: 0.9rem; }
+  .q-text .opt { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+
+  .row-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .choice-btn { padding: 8px 16px; background: transparent; border: 0.5px solid var(--border); border-radius: 3px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.12s; }
+  .choice-btn:hover { border-color: var(--border-hover); color: var(--white); }
+  .choice-btn.on { background: var(--white); border-color: var(--white); color: var(--black); font-weight: 700; }
+
+  /* Element rating rows */
+  .element-rating { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .element-rating:last-child { margin-bottom: 0; }
+  .element-label { font-size: 13px; color: rgba(231,231,231,0.7); width: 190px; flex-shrink: 0; line-height: 1.3; }
+  .mini-scale { display: flex; gap: 4px; flex: 1; }
+  .mini-btn { flex: 1; height: 34px; background: transparent; border: 0.5px solid var(--border); border-radius: 3px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.12s; display: flex; align-items: center; justify-content: center; }
+  .mini-btn:hover { border-color: var(--border-hover); color: var(--white); }
+  .mini-btn.on { background: var(--white); border-color: var(--white); color: var(--black); font-weight: 800; }
+  .mini-btn.on.low { background: #c0392b; border-color: #c0392b; color: #fff; }
+  .mini-btn.on.mid { background: #c8872a; border-color: #c8872a; color: #fff; }
+  .mini-btn.on.high { background: var(--white); border-color: var(--white); color: var(--black); }
+
+  /* Overall scale */
+  .scale-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+  .scale-btn { aspect-ratio: 1; background: transparent; border: 0.5px solid var(--border); border-radius: 3px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.12s; display: flex; align-items: center; justify-content: center; }
+  .scale-btn:hover { border-color: var(--border-hover); color: var(--white); }
+  .scale-btn.on { background: var(--white); border-color: var(--white); color: var(--black); font-weight: 800; }
+  .scale-ends { display: flex; justify-content: space-between; margin-top: 6px; }
+  .scale-end { font-size: 10px; color: rgba(231,231,231,0.2); letter-spacing: 0.04em; }
+
+  .radio-stack { display: flex; flex-direction: column; gap: 6px; }
+  .radio-btn { padding: 11px 14px; background: transparent; border: 0.5px solid var(--border); border-radius: 3px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.12s; text-align: left; line-height: 1.4; }
+  .radio-btn:hover { border-color: var(--border-hover); color: var(--white); }
+  .radio-btn.on { background: var(--white); border-color: var(--white); color: var(--black); font-weight: 600; }
+
+  .text-input, textarea { width: 100%; background: transparent; border: 0.5px solid var(--border); border-radius: 3px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 0.75rem 1rem; outline: none; transition: border-color 0.12s; }
+  .text-input:focus, textarea:focus { border-color: var(--border-hover); }
+  .text-input::placeholder, textarea::placeholder { color: rgba(231,231,231,0.18); }
+  textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+
+  .error-msg { font-size: 11px; color: #d94f4f; margin-top: 8px; display: none; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
+
+  /* Low score callout */
+  #block-lowscore { display: none; }
+
+  .submit-area { text-align: center; margin-top: 3rem; }
+  .submit-btn { background: var(--white); color: var(--black); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800; padding: 15px 48px; border: none; border-radius: 3px; cursor: pointer; letter-spacing: 0.1em; text-transform: uppercase; transition: opacity 0.12s, transform 0.1s; }
+  .submit-btn:hover { opacity: 0.85; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-note { font-size: 11px; color: var(--muted); margin-top: 10px; letter-spacing: 0.03em; }
+
+  .spinner { display: none; width: 22px; height: 22px; border: 2px solid rgba(231,231,231,0.12); border-top-color: var(--white); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #successScreen { display: none; min-height: 100vh; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 3rem 2rem; }
+  .success-wordmark { font-size: 11px; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); margin-bottom: 3rem; }
+  #successScreen h2 { font-size: clamp(32px, 7vw, 52px); font-weight: 800; color: var(--white); letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 0; }
+  #successScreen h2 em { font-style: italic; font-weight: 400; }
+  .success-divider { width: 28px; height: 3px; background: var(--white); margin: 1.5rem auto; }
+  #successScreen p { font-size: 14px; color: var(--muted); max-width: 300px; line-height: 1.7; }
+
+  .rule { height: 0.5px; background: var(--border); margin: 0.5rem 0 0; }
+
+  @media (max-width: 480px) {
+    .element-label { width: 130px; font-size: 12px; }
+    .mini-btn { font-size: 11px; height: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="formPage">
+  <header class="site-header">
+    <div class="wordmark">Central</div>
+    <div class="header-eyebrow">Easter 2025</div>
+    <h1 class="header-title">Easter Experience<br><em>Feedback.</em></h1>
+    <div class="header-divider"></div>
+    <p class="header-sub">Help us learn what worked and where we can grow. Takes about 3 minutes.</p>
+  </header>
+
+  <div class="form-wrap">
+
+    <div class="section-label">About You</div>
+
+    <div class="q-block">
+      <div class="q-text">Your name <span class="opt">optional</span></div>
+      <input class="text-input" type="text" id="respName" placeholder="First name is fine" autocomplete="off" />
+    </div>
+
+    <div class="q-block" id="block-team">
+      <div class="q-text">Which team are you on?</div>
+      <div class="row-wrap" id="teamRow"></div>
+      <div class="error-msg" id="err-team">Please select your team.</div>
+    </div>
+
+    <div class="rule"></div>
+    <div class="section-label">The Experience</div>
+
+    <div class="q-block" id="block-overall">
+      <div class="q-text">Overall, how would you rate this Easter's weekend experience?</div>
+      <div class="scale-grid" id="scaleOverall"></div>
+      <div class="scale-ends"><span class="scale-end">needs work</span><span class="scale-end">best yet</span></div>
+      <div class="error-msg" id="err-overall">Please give a rating.</div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-text">Rate each element of the weekend.</div>
+      <div id="elementRatings"></div>
+    </div>
+
+    <div class="q-block" id="block-lowscore">
+      <div class="q-text">If anything was a 5 or below, any helpful details? <span class="opt">optional</span></div>
+      <textarea id="txtLowScore" placeholder="Any context is helpful..."></textarea>
+    </div>
+
+    <div class="q-block">
+      <div class="q-text">In your own words — what's the one thing you'd point to as a win?</div>
+      <textarea id="txtWin" placeholder="What went really well..."></textarea>
+    </div>
+
+    <div class="rule"></div>
+    <div class="section-label">Growth + Opportunity</div>
+
+    <div class="q-block">
+      <div class="q-text">What's one area of opportunity for improvement heading into future Easter holiday weekends?</div>
+      <textarea id="txtImprove" placeholder="Be specific if you can — even a small thing helps..."></textarea>
+    </div>
+
+    <div class="q-block" id="block-story">
+      <div class="q-text">Did the story of hope we were trying to tell feel clear for the guest?</div>
+      <div class="radio-stack" id="storyClarity"></div>
+      <div class="error-msg" id="err-story">Please select an option.</div>
+    </div>
+
+    <div class="rule"></div>
+    <div class="section-label">Open Floor</div>
+
+    <div class="q-block">
+      <div class="q-text">Is there anything else you want us to know? <span class="opt">optional</span></div>
+      <textarea id="txtOpen" placeholder="Open floor..."></textarea>
+    </div>
+
+    <div class="submit-area">
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Submit Feedback</button>
+      <div class="spinner" id="spinner"></div>
+      <p class="submit-note">Responses may be shared with team leadership.</p>
+    </div>
+  </div>
+</div>
+
+<div id="successScreen">
+  <div class="success-wordmark">Central</div>
+  <h2>Thanks for<br><em>taking the time.</em></h2>
+  <div class="success-divider"></div>
+  <p>Your feedback helps us build something better every week — and it matters more than you know.</p>
+</div>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyB6iVl3M15D-YYYInQwBpjFNyMDHMVbkKIVk4oxPDhLX9LgzLiUuA96jwh-qpj03M8aA/exec';
+
+  const TEAMS = ['Campus Team', 'Media & Creative', 'Weekend Experience'];
+  const ELEMENTS = [
+    'Worship set',
+    'Message',
+    'Creative theme & media elements',
+    'Flow of service & transitions',
+    'Host moments',
+    'Production & tech',
+    'Lobby experience'
+  ];
+  const STORY_OPTIONS = [
+    'Yes — it came through clearly throughout',
+    'Mostly, with maybe one or two unclear moments',
+    'There were a few moments that felt disconnected',
+    'Not really — hard to track for a first-time guest'
+  ];
+
+  let selectedTeam = '', selectedOverall = 0, selectedStory = '';
+  let elementScores = {};
+
+  // Team
+  const teamRow = document.getElementById('teamRow');
+  TEAMS.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn'; b.textContent = t; b.type = 'button';
+    b.onclick = () => {
+      teamRow.querySelectorAll('.choice-btn').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); selectedTeam = t;
+      document.getElementById('block-team').classList.remove('has-error');
+      document.getElementById('err-team').style.display = 'none';
+    };
+    teamRow.appendChild(b);
+  });
+
+  // Overall scale
+  const scaleEl = document.getElementById('scaleOverall');
+  for (let i = 1; i <= 10; i++) {
+    const b = document.createElement('button');
+    b.className = 'scale-btn'; b.textContent = i; b.type = 'button';
+    b.onclick = () => {
+      scaleEl.querySelectorAll('.scale-btn').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); selectedOverall = i;
+      document.getElementById('block-overall').classList.remove('has-error');
+      document.getElementById('err-overall').style.display = 'none';
+    };
+    scaleEl.appendChild(b);
+  }
+
+  // Element ratings
+  const ratingsContainer = document.getElementById('elementRatings');
+  ELEMENTS.forEach(el => {
+    elementScores[el] = 0;
+    const row = document.createElement('div');
+    row.className = 'element-rating';
+
+    const label = document.createElement('div');
+    label.className = 'element-label';
+    label.textContent = el;
+
+    const scale = document.createElement('div');
+    scale.className = 'mini-scale';
+
+    for (let i = 1; i <= 10; i++) {
+      const b = document.createElement('button');
+      b.className = 'mini-btn';
+      b.textContent = i;
+      b.type = 'button';
+      const colorClass = i <= 5 ? 'low' : i <= 7 ? 'mid' : 'high';
+      b.onclick = () => {
+        scale.querySelectorAll('.mini-btn').forEach(x => {
+          x.classList.remove('on', 'low', 'mid', 'high');
+        });
+        b.classList.add('on', colorClass);
+        elementScores[el] = i;
+        checkLowScores();
+      };
+      scale.appendChild(b);
+    }
+
+    row.appendChild(label);
+    row.appendChild(scale);
+    ratingsContainer.appendChild(row);
+  });
+
+  function checkLowScores() {
+    const hasLow = Object.values(elementScores).some(v => v > 0 && v <= 5);
+    document.getElementById('block-lowscore').style.display = hasLow ? 'block' : 'none';
+  }
+
+  // Story clarity
+  const storyEl = document.getElementById('storyClarity');
+  STORY_OPTIONS.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'radio-btn'; b.textContent = opt; b.type = 'button';
+    b.onclick = () => {
+      storyEl.querySelectorAll('.radio-btn').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); selectedStory = opt;
+      document.getElementById('block-story').classList.remove('has-error');
+      document.getElementById('err-story').style.display = 'none';
+    };
+    storyEl.appendChild(b);
+  });
+
+  function handleSubmit() {
+    let valid = true;
+    if (!selectedTeam) { document.getElementById('block-team').classList.add('has-error'); document.getElementById('err-team').style.display = 'block'; valid = false; }
+    if (!selectedOverall) { document.getElementById('block-overall').classList.add('has-error'); document.getElementById('err-overall').style.display = 'block'; valid = false; }
+    if (!selectedStory) { document.getElementById('block-story').classList.add('has-error'); document.getElementById('err-story').style.display = 'block'; valid = false; }
+    if (!valid) { document.querySelector('.has-error').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+
+    const elementScoresSerialized = ELEMENTS.map(el => `${el}: ${elementScores[el] || 'N/A'}`).join(' | ');
+
+    const payload = {
+      timestamp: new Date().toLocaleString(),
+      name: document.getElementById('respName').value.trim() || 'Anonymous',
+      team: selectedTeam,
+      overallRating: selectedOverall,
+      elementRatings: elementScoresSerialized,
+      lowScoreDetails: document.getElementById('txtLowScore').value.trim(),
+      bigWin: document.getElementById('txtWin').value.trim(),
+      improvementOpportunity: document.getElementById('txtImprove').value.trim(),
+      storyClarity: selectedStory,
+      openFloor: document.getElementById('txtOpen').value.trim()
+    };
+
+    document.getElementById('submitBtn').style.display = 'none';
+    document.getElementById('spinner').style.display = 'block';
+
+    fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(() => showSuccess()).catch(() => showSuccess());
+  }
+
+  function showSuccess() {
+    document.getElementById('formPage').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'flex';
+    window.scrollTo(0, 0);
+  }
+</script>
+</body>
+</html>

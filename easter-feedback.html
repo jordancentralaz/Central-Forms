@@ -46,6 +46,9 @@
   /* Element rating rows */
   .element-rating { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
   .element-rating:last-child { margin-bottom: 0; }
+  .mini-scale-wrap { flex: 1; display: flex; flex-direction: column; }
+  .mini-scale-ends { display: flex; justify-content: space-between; margin-top: 3px; }
+  .mini-scale-end { font-size: 9px; color: rgba(231,231,231,0.2); letter-spacing: 0.03em; }
   .element-label { font-size: 13px; color: rgba(231,231,231,0.7); width: 190px; flex-shrink: 0; line-height: 1.3; }
   .mini-scale { display: flex; gap: 4px; flex: 1; }
   .mini-btn { flex: 1; height: 34px; background: transparent; border: 0.5px solid var(--border); border-radius: 3px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.12s; display: flex; align-items: center; justify-content: center; }
@@ -124,24 +127,31 @@
       <input class="text-input" type="text" id="respName" placeholder="First name is fine" autocomplete="off" />
     </div>
 
+
     <div class="q-block" id="block-team">
       <div class="q-text">Which team are you on?</div>
       <div class="row-wrap" id="teamRow"></div>
       <div class="error-msg" id="err-team">Please select your team.</div>
     </div>
 
+    <div class="q-block" id="block-campus">
+      <div class="q-text">Which campus are you evaluating based on?</div>
+      <div class="row-wrap" id="campusRow"></div>
+      <div class="error-msg" id="err-campus">Please select a campus.</div>
+    </div>
+
     <div class="rule"></div>
     <div class="section-label">The Experience</div>
 
     <div class="q-block" id="block-overall">
-      <div class="q-text">Overall, how would you rate this year's Easter experience?</div>
+      <div class="q-text">From the moment a guest arrived to the moment they left — how would you rate this year's Easter experience overall?</div>
       <div class="scale-grid" id="scaleOverall"></div>
       <div class="scale-ends"><span class="scale-end">needs work</span><span class="scale-end">best yet</span></div>
       <div class="error-msg" id="err-overall">Please give a rating.</div>
     </div>
 
     <div class="q-block">
-      <div class="q-text">In your own words — what's the one thing you'd point to as a win?</div>
+      <div class="q-text">In your own words — what's one thing you'd point to as a win?</div>
       <textarea id="txtWin" placeholder="What went really well..."></textarea>
     </div>
 
@@ -167,6 +177,11 @@
       <div class="q-text">Did the story of hope we were trying to tell feel clear for the guest?</div>
       <div class="radio-stack" id="storyClarity"></div>
       <div class="error-msg" id="err-story">Please select an option.</div>
+    </div>
+
+    <div class="q-block" id="block-story-context" style="display:none;">
+      <div class="q-text">Any context that would help us understand? <span class="opt">optional</span></div>
+      <textarea id="txtStoryContext" placeholder="What felt unclear or disconnected..."></textarea>
     </div>
 
     <div class="rule"></div>
@@ -195,27 +210,36 @@
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyB6iVl3M15D-YYYInQwBpjFNyMDHMVbkKIVk4oxPDhLX9LgzLiUuA96jwh-qpj03M8aA/exec';
 
-  const TEAMS = ['Campus Team', 'Media & Creative', 'Weekend Experience'];
   const ELEMENTS = [
-    'Worship set',
-    'Message',
+    'Lobby experience',
     'Creative theme & media elements',
     'Flow of service & transitions',
+    'Worship set',
     'Host moments',
-    'Production & tech',
-    'Lobby experience'
+    'Message',
+    'Production - lighting',
+    'Production - audio'
   ];
   const STORY_OPTIONS = [
     'Yes — it came through clearly throughout',
     'Mostly, with maybe one or two unclear moments',
     'There were a few moments that felt disconnected',
+    'Not really — hard to track for a first-time guest',
+    'N/A'
+  ];
+  const STORY_TRIGGER_CONTEXT = [
+    'There were a few moments that felt disconnected',
     'Not really — hard to track for a first-time guest'
   ];
 
-  let selectedTeam = '', selectedOverall = 0, selectedStory = '';
+  let selectedTeam = '', selectedCampus = '', selectedOverall = 0, selectedStory = '';
   let elementScores = {};
 
   // Team
+
+
+  const TEAMS = ['Campus Team', 'Media & Creative', 'Weekend Experience'];
+  const CAMPUSES = ['Gilbert', 'Glendale', 'Mesa', 'Tempe', 'Queen Creek'];
   const teamRow = document.getElementById('teamRow');
   TEAMS.forEach(t => {
     const b = document.createElement('button');
@@ -227,6 +251,19 @@
       document.getElementById('err-team').style.display = 'none';
     };
     teamRow.appendChild(b);
+  });
+
+  const campusRow = document.getElementById('campusRow');
+  CAMPUSES.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn'; b.textContent = c; b.type = 'button';
+    b.onclick = () => {
+      campusRow.querySelectorAll('.choice-btn').forEach(x => x.classList.remove('on'));
+      b.classList.add('on'); selectedCampus = c;
+      document.getElementById('block-campus').classList.remove('has-error');
+      document.getElementById('err-campus').style.display = 'none';
+    };
+    campusRow.appendChild(b);
   });
 
   // Overall scale
@@ -256,6 +293,9 @@
     label.className = 'element-label';
     label.textContent = el;
 
+    const scaleWrap = document.createElement('div');
+    scaleWrap.className = 'mini-scale-wrap';
+
     const scale = document.createElement('div');
     scale.className = 'mini-scale';
 
@@ -276,8 +316,15 @@
       scale.appendChild(b);
     }
 
+    const scaleEnds = document.createElement('div');
+    scaleEnds.className = 'mini-scale-ends';
+    scaleEnds.innerHTML = '<span class="mini-scale-end">needs work</span><span class="mini-scale-end">best yet</span>';
+
+    scaleWrap.appendChild(scale);
+    scaleWrap.appendChild(scaleEnds);
+
     row.appendChild(label);
-    row.appendChild(scale);
+    row.appendChild(scaleWrap);
     ratingsContainer.appendChild(row);
   });
 
@@ -296,6 +343,9 @@
       b.classList.add('on'); selectedStory = opt;
       document.getElementById('block-story').classList.remove('has-error');
       document.getElementById('err-story').style.display = 'none';
+      const contextBlock = document.getElementById('block-story-context');
+      contextBlock.style.display = STORY_TRIGGER_CONTEXT.includes(opt) ? 'block' : 'none';
+      if (!STORY_TRIGGER_CONTEXT.includes(opt)) document.getElementById('txtStoryContext').value = '';
     };
     storyEl.appendChild(b);
   });
@@ -303,6 +353,7 @@
   function handleSubmit() {
     let valid = true;
     if (!selectedTeam) { document.getElementById('block-team').classList.add('has-error'); document.getElementById('err-team').style.display = 'block'; valid = false; }
+    if (!selectedCampus) { document.getElementById('block-campus').classList.add('has-error'); document.getElementById('err-campus').style.display = 'block'; valid = false; }
     if (!selectedOverall) { document.getElementById('block-overall').classList.add('has-error'); document.getElementById('err-overall').style.display = 'block'; valid = false; }
     if (!selectedStory) { document.getElementById('block-story').classList.add('has-error'); document.getElementById('err-story').style.display = 'block'; valid = false; }
     if (!valid) { document.querySelector('.has-error').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
@@ -313,12 +364,14 @@
       timestamp: new Date().toLocaleString(),
       name: document.getElementById('respName').value.trim() || 'Anonymous',
       team: selectedTeam,
+      campus: selectedCampus,
       overallRating: selectedOverall,
       elementRatings: elementScoresSerialized,
       lowScoreDetails: document.getElementById('txtLowScore').value.trim(),
       bigWin: document.getElementById('txtWin').value.trim(),
       improvementOpportunity: document.getElementById('txtImprove').value.trim(),
       storyClarity: selectedStory,
+      storyContext: document.getElementById('txtStoryContext').value.trim(),
       openFloor: document.getElementById('txtOpen').value.trim()
     };
 

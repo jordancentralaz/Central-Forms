@@ -59,7 +59,9 @@
   .scale-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
   .scale-btn { aspect-ratio: 1; background: transparent; border: 0.5px solid var(--border); border-radius: 3px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.12s; display: flex; align-items: center; justify-content: center; }
   .scale-btn:hover { border-color: var(--border-hover); color: var(--white); }
-  .scale-btn.on { background: var(--white); border-color: var(--white); color: var(--black); font-weight: 800; }
+  .scale-btn.on.low { background: #c0392b; border-color: #c0392b; color: #fff; font-weight: 800; }
+  .scale-btn.on.mid { background: #c8872a; border-color: #c8872a; color: #fff; font-weight: 800; }
+  .scale-btn.on.high { background: var(--white); border-color: var(--white); color: var(--black); font-weight: 800; }
   .scale-ends { display: flex; justify-content: space-between; margin-top: 6px; }
   .scale-end { font-size: 10px; color: rgba(231,231,231,0.2); letter-spacing: 0.04em; }
 
@@ -132,10 +134,15 @@
     <div class="section-label">The Experience</div>
 
     <div class="q-block" id="block-overall">
-      <div class="q-text">Overall, how would you rate this Easter's weekend experience?</div>
+      <div class="q-text">Overall, how would you rate this year's Easter experience?</div>
       <div class="scale-grid" id="scaleOverall"></div>
       <div class="scale-ends"><span class="scale-end">needs work</span><span class="scale-end">best yet</span></div>
       <div class="error-msg" id="err-overall">Please give a rating.</div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-text">In your own words — what's the one thing you'd point to as a win?</div>
+      <textarea id="txtWin" placeholder="What went really well..."></textarea>
     </div>
 
     <div class="q-block">
@@ -146,11 +153,6 @@
     <div class="q-block" id="block-lowscore">
       <div class="q-text">If anything was a 5 or below, any helpful details? <span class="opt">optional</span></div>
       <textarea id="txtLowScore" placeholder="Any context is helpful..."></textarea>
-    </div>
-
-    <div class="q-block">
-      <div class="q-text">In your own words — what's the one thing you'd point to as a win?</div>
-      <textarea id="txtWin" placeholder="What went really well..."></textarea>
     </div>
 
     <div class="rule"></div>
@@ -187,7 +189,7 @@
   <div class="success-wordmark">Central</div>
   <h2>Thanks for<br><em>taking the time.</em></h2>
   <div class="success-divider"></div>
-  <p>Your feedback helps us build something better every week — and it matters more than you know.</p>
+  <p>Your input goes a long way in helping make next Easter even better.</p>
 </div>
 
 <script>
@@ -232,9 +234,11 @@
   for (let i = 1; i <= 10; i++) {
     const b = document.createElement('button');
     b.className = 'scale-btn'; b.textContent = i; b.type = 'button';
+    const colorClass = i <= 5 ? 'low' : i <= 7 ? 'mid' : 'high';
     b.onclick = () => {
-      scaleEl.querySelectorAll('.scale-btn').forEach(x => x.classList.remove('on'));
-      b.classList.add('on'); selectedOverall = i;
+      scaleEl.querySelectorAll('.scale-btn').forEach(x => x.classList.remove('on', 'low', 'mid', 'high'));
+      b.classList.add('on', colorClass);
+      selectedOverall = i;
       document.getElementById('block-overall').classList.remove('has-error');
       document.getElementById('err-overall').style.display = 'none';
     };

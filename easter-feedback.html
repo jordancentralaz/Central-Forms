@@ -101,6 +101,9 @@
   #successScreen p { font-size: 14px; color: var(--muted); max-width: 300px; line-height: 1.7; }
 
   .rule { height: 0.5px; background: var(--border); margin: 0.5rem 0 0; }
+  .char-count { font-size: 11px; color: var(--muted); text-align: right; margin-top: 5px; transition: color 0.15s; }
+  .char-count.warn { color: #c8872a; }
+  .char-count.over { color: #c0392b; }
 
   @media (max-width: 480px) {
     .element-label { width: 130px; font-size: 12px; }
@@ -154,12 +157,14 @@
 
     <div class="q-block" id="block-overall-context" style="display:none;">
       <div class="q-text">Any context on the overall rating? <span class="opt">optional</span></div>
-      <textarea id="txtOverallContext" placeholder="What contributed to that score..."></textarea>
+      <textarea id="txtOverallContext" maxlength="280" placeholder="What contributed to that score..."></textarea>
+      <div class="char-count" id="count-txtOverallContext">280 characters remaining</div>
     </div>
 
     <div class="q-block">
       <div class="q-text">In your own words — what's one thing you'd point to as a win?</div>
-      <textarea id="txtWin" placeholder="What went really well..."></textarea>
+      <textarea id="txtWin" maxlength="280" placeholder="What went really well..."></textarea>
+      <div class="char-count" id="count-txtWin">280 characters remaining</div>
     </div>
 
     <div class="q-block">
@@ -169,7 +174,8 @@
 
     <div class="q-block" id="block-lowscore">
       <div class="q-text">If anything was a 5 or below, any helpful details? <span class="opt">optional</span></div>
-      <textarea id="txtLowScore" placeholder="Any context is helpful..."></textarea>
+      <textarea id="txtLowScore" maxlength="280" placeholder="Any context is helpful..."></textarea>
+      <div class="char-count" id="count-txtLowScore">280 characters remaining</div>
     </div>
 
     <div class="rule"></div>
@@ -177,7 +183,8 @@
 
     <div class="q-block">
       <div class="q-text">What's one area of opportunity for improvement heading into future Easter holiday weekends?</div>
-      <textarea id="txtImprove" placeholder="Be specific if you can — even a small thing helps..."></textarea>
+      <textarea id="txtImprove" maxlength="280" placeholder="Be specific if you can — even a small thing helps..."></textarea>
+      <div class="char-count" id="count-txtImprove">280 characters remaining</div>
     </div>
 
     <div class="q-block" id="block-story">
@@ -188,7 +195,8 @@
 
     <div class="q-block" id="block-story-context" style="display:none;">
       <div class="q-text">Any context that would help us understand? <span class="opt">optional</span></div>
-      <textarea id="txtStoryContext" placeholder="What felt unclear or disconnected..."></textarea>
+      <textarea id="txtStoryContext" maxlength="280" placeholder="What felt unclear or disconnected..."></textarea>
+      <div class="char-count" id="count-txtStoryContext">280 characters remaining</div>
     </div>
 
     <div class="rule"></div>
@@ -196,7 +204,8 @@
 
     <div class="q-block">
       <div class="q-text">Is there anything else you want us to know? <span class="opt">optional</span></div>
-      <textarea id="txtOpen" placeholder="Open floor..."></textarea>
+      <textarea id="txtOpen" maxlength="280" placeholder="Open floor..."></textarea>
+      <div class="char-count" id="count-txtOpen">280 characters remaining</div>
     </div>
 
     <div class="submit-area">
@@ -393,6 +402,22 @@
     fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       .then(() => showSuccess()).catch(() => showSuccess());
   }
+
+
+  // Character counters
+  const textareaIds = ['txtLowScore', 'txtWin', 'txtImprove', 'txtStoryContext', 'txtOpen', 'txtOverallContext'];
+  textareaIds.forEach(id => {
+    const el = document.getElementById(id);
+    const counter = document.getElementById('count-' + id);
+    if (!el || !counter) return;
+    el.addEventListener('input', () => {
+      const remaining = 280 - el.value.length;
+      counter.textContent = remaining + ' characters remaining';
+      counter.classList.remove('warn', 'over');
+      if (remaining <= 50 && remaining > 0) counter.classList.add('warn');
+      if (remaining <= 0) counter.classList.add('over');
+    });
+  });
 
   function showSuccess() {
     document.getElementById('formPage').style.display = 'none';

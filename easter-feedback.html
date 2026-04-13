@@ -25,6 +25,7 @@
   .header-title { font-size: clamp(40px, 8vw, 64px); font-weight: 800; color: var(--black); line-height: 1.0; letter-spacing: -0.025em; margin-bottom: 0; }
   .header-title em { font-style: italic; font-weight: 400; }
   .header-divider { width: 28px; height: 3px; background: var(--black); margin: 1.25rem auto; }
+  .header-tag { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(16,16,16,0.35); margin-bottom: 0.5rem; }
   .header-sub { font-size: 14px; color: rgba(16,16,16,0.48); max-width: 360px; margin: 0 auto; }
 
   .form-wrap { max-width: 580px; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
@@ -115,6 +116,7 @@
     <div class="header-eyebrow">Easter 2026</div>
     <h1 class="header-title">Easter Experience<br><em>Feedback.</em></h1>
     <div class="header-divider"></div>
+    <p class="header-tag">Feedback Matters.</p>
     <p class="header-sub">Help us learn what worked and where we can grow. Takes about 3 minutes.</p>
   </header>
 
@@ -122,8 +124,8 @@
 
     <div class="section-label">About You</div>
 
-    <div class="q-block">
-      <div class="q-text">Your name <span class="opt">optional</span></div>
+    <div class="q-block" id="block-name">
+      <div class="q-text">Your name</div>
       <input class="text-input" type="text" id="respName" placeholder="First name is fine" autocomplete="off" />
     </div>
 
@@ -148,6 +150,11 @@
       <div class="scale-grid" id="scaleOverall"></div>
       <div class="scale-ends"><span class="scale-end">needs work</span><span class="scale-end">best yet</span></div>
       <div class="error-msg" id="err-overall">Please give a rating.</div>
+    </div>
+
+    <div class="q-block" id="block-overall-context" style="display:none;">
+      <div class="q-text">Any context on the overall rating? <span class="opt">optional</span></div>
+      <textarea id="txtOverallContext" placeholder="What contributed to that score..."></textarea>
     </div>
 
     <div class="q-block">
@@ -278,6 +285,9 @@
       selectedOverall = i;
       document.getElementById('block-overall').classList.remove('has-error');
       document.getElementById('err-overall').style.display = 'none';
+      const overallContext = document.getElementById('block-overall-context');
+      overallContext.style.display = i <= 5 ? 'block' : 'none';
+      if (i > 5) document.getElementById('txtOverallContext').value = '';
     };
     scaleEl.appendChild(b);
   }
@@ -352,6 +362,7 @@
 
   function handleSubmit() {
     let valid = true;
+    if (!document.getElementById('respName').value.trim()) { document.getElementById('block-name').classList.add('has-error'); document.getElementById('err-name').style.display = 'block'; valid = false; }
     if (!selectedTeam) { document.getElementById('block-team').classList.add('has-error'); document.getElementById('err-team').style.display = 'block'; valid = false; }
     if (!selectedCampus) { document.getElementById('block-campus').classList.add('has-error'); document.getElementById('err-campus').style.display = 'block'; valid = false; }
     if (!selectedOverall) { document.getElementById('block-overall').classList.add('has-error'); document.getElementById('err-overall').style.display = 'block'; valid = false; }
@@ -366,6 +377,7 @@
       team: selectedTeam,
       campus: selectedCampus,
       overallRating: selectedOverall,
+      overallContext: document.getElementById('txtOverallContext').value.trim(),
       elementRatings: elementScoresSerialized,
       lowScoreDetails: document.getElementById('txtLowScore').value.trim(),
       bigWin: document.getElementById('txtWin').value.trim(),
